@@ -1,6 +1,7 @@
 <template>
   <div>
     <h1 class="centralizado">{{titulo}}</h1>
+    <p v-show="mensagem" class="mensagem">{{ mensagem }}</p>
     <input v-on:input="filtro = $event.target.value" type="search" class="filtro" placeholder="Pesquisar...">
     <ul class="lista-fotos">
       <li class="lista-fotos-item" v-for="foto of fotosComFiltro">
@@ -28,6 +29,7 @@
 import Painel from '../shared/painel/Painel.vue'
 import ImagemResponsiva from '../shared/imagem-responsiva/ImagemResponsiva.vue'
 import Botao from '../shared/botao/Botao.vue'
+import FotoService from '../../domain/foto/FotoService'
 
 export default {
 
@@ -40,12 +42,14 @@ export default {
     return {
       titulo: "Alurapic",
       fotos: [],
-      filtro: ''
+      filtro: '',
+      mensagem: ''
     }
   },
   created(){
-    this.$http.get('http://localhost:3000/v1/fotos')
-      .then(res =>  res.json())
+    this.service = new FotoService(this.$resource)
+    this.service
+      .lista()
       .then(fotos => this.fotos = fotos, err => console.log(err))
   },
 
@@ -63,8 +67,28 @@ export default {
   methods: {
     removeFoto(foto, $event){
       // /+' event: '+$event
-      alert('Remover a foto? '+foto.titulo)
+      //console.log('f', foto)
       
+      this.service.apaga(foto._id)
+      .then(() => {
+          let index = this.fotos.indexOf(foto)
+          this.fotos.splice(index, 1)
+          this.mensagem = 'foto removida com sucesso!'
+          }, err => {
+            console.log('error', err)
+            this.mensagem = 'Não foi possível remover a foto!'
+          })
+
+      // this.$http.delete(`v1/fotos/${foto._id}`)
+      //   .then(() => {
+      //     let index = this.fotos.indexOf(foto)
+      //     this.fotos.splice(index, 1)
+      //     this.mensagem = 'foto removida com sucesso!'
+      //     }, err => {
+      //       console.log('error', err)
+      //       this.mensagem = 'Não foi possível remover a foto!'
+      //     })
+
     }
   }
     
