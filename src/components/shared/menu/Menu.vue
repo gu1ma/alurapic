@@ -2,7 +2,7 @@
     <nav>
       <ul>
         <li v-for="router in routes">
-          <router-link :to="router.path">{{ router.name }}</router-link>
+          <router-link :to="router.path">{{ router.titulo }}</router-link>
         </li>
       </ul>
     </nav>

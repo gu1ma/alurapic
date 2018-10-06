@@ -11,6 +11,11 @@
             :url="foto.url" 
             :titulo="foto.titulo"
             v-meu-transform:scale.animate="1.2"></imagem-responsiva>
+            
+            <router-link :to="{name: 'altera', params: {id: foto._id}}">
+              <meu-botao estilo="padrao" tipo="button" rotulo="ALTERAR" />
+            </router-link/>
+
             <meu-botao 
             tipo="button" 
             rotulo="REMOVER" 
@@ -50,7 +55,11 @@ export default {
     this.service = new FotoService(this.$resource)
     this.service
       .lista()
-      .then(fotos => this.fotos = fotos, err => console.log(err))
+      .then(fotos => this.fotos = fotos, 
+      err => {
+          this.mensagem = err.message
+        }
+     )
   },
 
   computed: {

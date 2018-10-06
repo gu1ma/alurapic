@@ -3,18 +3,23 @@
         <h1 class="centralizado">Cadastro</h1>
         <h2 class="centralizado"></h2>
 
+        <h2 class="centralizado" v-if="foto._id">Alterando</h2>
+        <h2 class="centralizado" v-else>Incluindo</h2>
+
         <form @submit.prevent="grava">
 
         <div class="controle">
             <label for="titulo">TÍTULO</label>
-            <input id="titulo" autocomplete="off" 
-            v-model.lazy="foto.titulo">
+            <input data-vv-has="título" name="titulo" v-validate data-vv-rules="required|min:3|max:15" id="titulo" autocomplete="off" 
+            v-model="foto.titulo">
+            <span class="erro" v-show="errors.has('titulo')">{{errors.first('titulo')}}</span>
         </div>
 
         <div class="controle">
             <label for="url">URL</label>
-            <input id="url" autocomplete="off" 
-            v-model.lazy="foto.url"> 
+            <input name="url" id="url" autocomplete="off" 
+            v-model="foto.url" v-validate data-vv-rules="required"> 
+            <span class="erro" v-show="errors.has('url')">{{errors.first('url')}}</span>
             <imagem-responsiva v-show="foto.url" :url="foto.url" :titulo="foto.titulo" />
         </div>
 
@@ -27,7 +32,7 @@
 
         <div class="centralizado">
             <meu-botao rotulo="GRAVAR" tipo="submit"/>
-            <router-link to="/"><meu-botao rotulo="VOLTAR" tipo="button"/></router-link>
+            <router-link :to="{ name: 'home' }"><meu-botao rotulo="VOLTAR" tipo="button"/></router-link>
         </div>
 
         </form>
@@ -50,20 +55,38 @@ export default {
 
   data(){
       return {
-          foto: new Foto
+          foto: new Foto,
+          id: this.$route.params.id
       }
   },
 
   created(){
       this.service = new FotoService(this.$resource)
+
+      if(this.id){
+          this.service.busca(this.id)
+          .then(foto => this.foto = foto)
+      }
+
   },
 
   methods: {
       grava(){
           console.log(this.foto)
 
-          this.service.cadastra(this.foto)
-            .then(() => this.foto = new Foto, err => {console.log('error', err)})
+          this.$validate
+            .validateAll()
+            .then(success =>{
+                if(success){
+                    this.service.cadastra(this.foto)
+                    .then(() => 
+                        { 
+                            this.foto = new Foto,
+                            this.$router.push({ name:'home' })
+                        }, 
+                        err => {console.log('error', err)})
+                        }
+            })
       }
   }
 }
@@ -92,6 +115,10 @@ export default {
 
   .centralizado {
     text-align: center;
+  }
+
+  .erro{
+      color: red
   }
 
 </style>

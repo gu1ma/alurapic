@@ -6,11 +6,26 @@ export const routes = [
     {
         path: '/',
         component: Home,
-        name: "Home"
+        name: "home",
+        titulo: "Home",
+        menu: true
     },
     {
         path: '/cadastro',
         component: Cadastro,
-        name: "Cadastro"
+        name: "cadastro",
+        titulo: "Cadastro",
+        menu: true
+    },
+    {
+        path: '/cadastro/:id',
+        component: Cadastro,
+        name: "altera",
+        menu: false
+    },
+    {
+        path: '*',
+        component: Home,
+        menu: false
     }
 ]
